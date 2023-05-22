@@ -55,6 +55,10 @@ class InstrumentViewModel(private val instrumentRepository: InstrumentRepository
         category.value = instrument.category
     }
 
+    fun clearStatus() {
+        status.value = INACTIVE
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
