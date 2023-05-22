@@ -5,7 +5,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.music_tracker.R
+import com.example.music_tracker.data.model.InstrumentModel
+import com.example.music_tracker.databinding.FragmentInstrumentDirectoryBinding
+import com.example.music_tracker.ui.instrument.directory.recyclerview.InstrumentRecyclerViewAdapter
+import com.example.music_tracker.ui.instrument.viewmodel.InstrumentViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,43 +27,52 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class InstrumentDirectoryFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var btnCreateNewInstrument: FloatingActionButton
+    private lateinit var binding: FragmentInstrumentDirectoryBinding
+    private lateinit var adapter: InstrumentRecyclerViewAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private val instrumentVM: InstrumentViewModel by activityViewModels {
+        InstrumentViewModel.Factory
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_instrument_directory, container, false)
+        binding = FragmentInstrumentDirectoryBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment InstrumentDirectoryFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            InstrumentDirectoryFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        btnCreateNewInstrument = view.findViewById(R.id.btnNavCreateNewInstrument)
+
+        setRecyclerView(view)
+
+        btnCreateNewInstrument.setOnClickListener {
+            instrumentVM.clearData()
+        }
+
+    }
+
+    private fun showSelectedItem(ins: InstrumentModel) {
+        instrumentVM.setSelectedInstrument(ins)
+    }
+
+    private fun display() {
+        adapter.setData(instrumentVM.getInstruments())
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun setRecyclerView(view: View) {
+        binding.instrumentRecyclerView.layoutManager = LinearLayoutManager(view.context)
+
+        adapter = InstrumentRecyclerViewAdapter{selected ->
+            showSelectedItem(selected)
+        }
+
+        binding.instrumentRecyclerView.adapter = adapter
+        display()
     }
 }

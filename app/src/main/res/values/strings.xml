@@ -7,4 +7,5 @@
     <string name="category_hint">category</string>
     <string name="submit_button_text">Submit</string>
     <string name="flute_text_view">Flute</string>
+    <string name="directory_text_view">Directory</string>
 </resources>
